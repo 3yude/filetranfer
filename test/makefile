@@ -1,16 +1,24 @@
 # Thanks to Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
-PROGS := test_selectcli test_server
+PROGS := test_select_cli test_echo_server \
+			test_nonblockwrite_cli test_nonblockwrite_server
 
 CC = gcc
 CFLAGS = -I../lib -g -O2  -Wall
 
-ALL: test_server test_selectcli
+ALL: ${PROGS}
 
-test_selectcli: test_selectcli.c
+test_select_cli: test_select_cli.c
 	${CC} ${CFLAGS} $^ -o $@
 
-test_server: test_server.c
+test_echo_server: test_echo_server.c
+	${CC} ${CFLAGS} $^ -o $@
+
+test_nonblockwrite_server: test_nonblockwrite_server.c
+	${CC} ${CFLAGS} $^ -o $@
+
+test_nonblockwrite_cli: test_nonblockwrite_cli.c
 	${CC} ${CFLAGS} $^ -o $@
 
 clean:
-	rm -f test_selectcli test_server
+	rm -f test_select_cli test_echo_server 
+	rm -f test_nonblockwrite_cli test_nonblockwrite_server
