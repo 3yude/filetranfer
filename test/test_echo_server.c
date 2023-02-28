@@ -1,7 +1,5 @@
 #include "net.h"
-#include <asm-generic/socket.h>
-#include <stdio.h>
-#include <sys/socket.h>
+#include <unistd.h>
 
 void sendfile(int connfd);
 void echo(int);
@@ -13,7 +11,7 @@ int main(int argc, char **argv) {
     struct sockaddr_in cliaddr, servaddr;
 
     /* AF_INET --> IPv4 , SOCK_STREAM --> tcp, protocol = 0 --> will select corresponding protocol automactically */
-    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    listenfd = socket(PF_INET, SOCK_STREAM, 0);
 
     /* init servaddr */
     bzero(&servaddr, sizeof(servaddr));
@@ -35,10 +33,11 @@ int main(int argc, char **argv) {
         /*     close(listenfd); */
 
             /* do something in child process */
-        printf("Server: Before echo");
-        fflush(stdout);
+        printf("Server: Before echo\n");
+
         echo(connfd);
-        printf("Server: After echo");
+
+        printf("Server: After echo\n");
 
             /* exit(0); */
         /* } */
@@ -52,13 +51,13 @@ void echo(int socketfd) {
     for (;;) {
         int n;
         if ((n = read(socketfd, buf, maxbuf)) < 0) {
-            printf("Error read!");
+            printf("Server: Error read!");
             exit(1);
         } else if (n == 0) {
-            printf("Error read!");
+            printf("Server: Finish!");
             break;
         } else {
-            write(fileno(stdout), buf, n);
+            write(STDOUT_FILENO, buf, n);
         }
     }
 }

@@ -1,16 +1,5 @@
-#include <stdio.h>
-#include <sys/select.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <sys/param.h>
-#include <unistd.h>
 #include "net.h"
-
-
-#define  SERV_IP      "127.0.0.1"
+#include <unistd.h>
 
 void echo(int socketfd);
 
@@ -34,8 +23,10 @@ int main(int argc, char **argv)
     int val, maxdfp1;
     fd_set rset;
     
+    val = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, val | O_NONBLOCK);
     val = fcntl(sockfd, F_GETFL, 0);
-    fcntl(sockfd, F_GETFL, val | O_NONBLOCK);
+    fcntl(sockfd, F_SETFL, val | O_NONBLOCK);
 
     FD_ZERO(&rset);
     FD_SET(STDERR_FILENO, &rset);
@@ -62,11 +53,12 @@ void echo(int socketfd) {
     char buf[maxbuf];
     for (;;) {
         int n;
-        if ((n = read(fileno(stdin), buf, maxbuf)) < 0) {
-            printf("Error read!");
+        if ((n = read(STDIN_FILENO, buf, maxbuf)) < 0) {
+            if (errno != EWOULDBLOCK)
+                printf("Client: Error read!\n");
             exit(1);
         } else if (n == 0) {
-            printf("Finish");
+            printf("Client: Finish\n");
             break;
         } else {
             write(socketfd, buf, n);
