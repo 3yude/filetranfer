@@ -11,6 +11,7 @@
 #include <sys/param.h>
 #include <asm-generic/socket.h>
 #include <errno.h>
+#include <pthread.h>
 
 #define  SERV_IP      "127.0.0.1"
 #define	SERV_PORT		 9876			/* TCP and UDP */
