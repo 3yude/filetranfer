@@ -6,7 +6,6 @@ void echo(int);
 
 int main(int argc, char **argv) {
     int listenfd, connfd;
-    pid_t childpid;
     socklen_t clilen;
     struct sockaddr_in cliaddr, servaddr;
 
@@ -22,25 +21,20 @@ int main(int argc, char **argv) {
     const int reuse;
     setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
     setsockopt(listenfd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse));
-    int bindret = bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+
+    if (0 != bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr))) {
+        perror("bind error!");
+        exit(EXIT_FAILURE);
+    }
 
     listen(listenfd, LISTENQ);
 
     for(;;) {
         clilen = sizeof(cliaddr);
         connfd = accept(listenfd, (struct sockaddr *)&cliaddr, &clilen);
-        /* if ((childpid = fork()) == 0) { */
-        /*     close(listenfd); */
-
-            /* do something in child process */
-        printf("Server: Before echo\n");
 
         echo(connfd);
 
-        printf("Server: After echo\n");
-
-            /* exit(0); */
-        /* } */
         close(connfd);
     }
 }
